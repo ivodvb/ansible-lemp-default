@@ -1,0 +1,24 @@
+---
+apt_cache_timeout: 30
+general_packages:
+  - software-properties-common
+  - libssl-dev
+  - build-essential
+  - zlib1g-dev
+  - libpcre3-dev
+  - uuid-dev
+  - memcached
+  - curl
+  - git
+  - sudo
+  - zip
+  - unzip
+  - libncursesw5-dev
+  - libglib2.0-dev
+  - libgeoip-dev
+  - libtokyocabinet-dev
+  - autoconf
+  - autopoint
+  - supervisor
+  - htop
+  - python-passlib

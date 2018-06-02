@@ -1,0 +1,11 @@
+[Unit]
+Description=Goaccess
+After=network.target
+
+[Service]
+Restart=always
+Environment=HOME=/root
+ExecStart=/usr/local/bin/goaccess /var/log/nginx/access.log -o /var/www/html/public/goaccess-report.html --ssl-cert="/etc/letsencrypt/live/{{ hostname }}/fullchain.pem" --ssl-key"=/etc/letsencrypt/live/{{ hostname }}/privkey.pem" --real-time-html
+
+[Install]
+WantedBy=multi-user.target

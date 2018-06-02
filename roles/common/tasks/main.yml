@@ -1,0 +1,57 @@
+---
+- name: Include defaults
+  include_vars: ../defaults/main.yml
+
+- name: Set locale
+  become: true
+  template:
+    src: ../files/locale
+    dest: /etc/default/locale
+
+- name: Set environment
+  become: true
+  template:
+    src: ../files/environment
+    dest: /etc/default/environment
+
+- name: Set hostname
+  become: true
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Ensure a locale exists
+  become: true
+  locale_gen:
+    name: en_US.UTF-8
+    state: present
+
+- name: Apt update and upgrade
+  become: true
+  apt:
+    update_cache: yes
+    upgrade: full
+    autoremove: yes
+    autoclean: yes
+
+- name: Install general packages
+  become: true
+  apt:
+    name: "{{ item }}"
+    cache_valid_time: "{{ apt_cache_timeout }}"
+    state: present
+  with_items:
+    - "{{ general_packages }}"
+
+- name: Install ultimate vim
+  import_tasks: vim.yml
+
+# Need to run _dev because openssl 1.1 is not supported in the stable release yet
+- name: Install goaccess
+  import_tasks: goaccess_dev.yml
+
+# Should be addeed to the nginx role, but we need this for Letsencrypt which is runned befre the nginx role, nginx
+# writes ssl configuration right away, so Letsencrypt can't be run after the nginx role
+# todo check if we can improve this
+- name: Create web root directory
+  become: True
+  file: path=/var/www/html/public state=directory owner=www-data group=www-data mode=2775

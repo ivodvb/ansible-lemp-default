@@ -1,0 +1,10 @@
+[default]
+10.0.0.1
+
+[default:vars]
+ansible_user=root
+hostname=ansible.example
+letsencrypt_email=info@certbot.org
+letsencrypt_ssl=yes
+nginx_global_auth_username=username
+nginx_global_auth_password=password

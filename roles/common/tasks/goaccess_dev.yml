@@ -1,0 +1,56 @@
+---
+- name: Clone goaccess repo
+  become: True
+  git:
+    repo: git://github.com/allinurl/goaccess
+    dest: /root/goaccess
+
+- name: autoreconf goaccess
+  become: True
+  command: >
+    autoreconf -fiv
+    chdir=/root/goaccess
+
+- name: Configure goaccess
+  become: True
+  command: >
+    ./configure --enable-utf8 --enable-geoip=legacy --with-openssl
+    chdir=/root/goaccess
+
+- name: Make goaccess
+  become: True
+  command: >
+    make
+    chdir=/root/goaccess
+
+- name: Intall goaccess
+  become: True
+  command: >
+    make install
+    chdir=/root/goaccess
+
+- name: Copy goaccess configuration file
+  become: True
+  copy:
+    src: ../files/goaccess/goaccess.conf
+    dest: /usr/local/etc/goaccess.conf
+
+- name: Add goaccess service
+  become: True
+  template:
+    src: ../files/goaccess/goaccess.service.j2
+    dest: /etc/systemd/system/goaccess.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable service goaccess and start
+  become: True
+  systemd:
+    name: goaccess
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- debug:
+    msg: "PLEASE KEEP IN MIND THAT THE GOACCESS WEBSOCKET IS NOT SECURED, UPDATE YOUR FIREWALL AND ONLY ALLOW ACCESS TO PORT 7890 FROM WHITELISTED IPS"

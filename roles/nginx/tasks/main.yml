@@ -1,0 +1,78 @@
+---
+- name: Check if nginx is running
+  command: systemctl status nginx
+  register: nginx_check
+  ignore_errors: yes
+  failed_when: false
+
+- name: Download nginx sources
+  become: True
+  get_url:
+    url: "{{ nginx_installation_url }}"
+    dest: /tmp/nginx_install.sh
+    mode: "u+x"
+  when: nginx_check.stdout.find('dead') != -1
+
+- name: Install nginx
+  become: True
+  command: "/tmp/nginx_install.sh --nginx-version {{ nginx_version }} -a '{{ nginx_custom_modules }}'"
+  when: nginx_check.stdout.find('dead') != -1
+
+- name: Add nginx main configuration file
+  become: True
+  template:
+    src: ../files/nginx.conf
+    dest: /usr/local/nginx/conf/nginx.conf
+  notify: restart nginx
+
+- name: Create nginx conf.d directory
+  become: True
+  file: path=/usr/local/nginx/conf/conf.d state=directory
+
+- name: Create nginx log directory
+  become: True
+  file: path=/var/log/nginx state=directory
+
+- name: Add nginx secure site configuration file
+  become: True
+  template:
+    src: ../files/conf.d/default.conf.j2
+    dest: /usr/local/nginx/conf/conf.d/default.conf
+  when: (nginx_insecure is undefined or nginx_insecure == "no")
+  notify: restart nginx
+
+- name: Add nginx insecure site configuration file
+  become: True
+  template:
+    src: ../files/conf.d/default.conf.j2
+    dest: /usr/local/nginx/conf/conf.d/default.conf
+  when: nginx_insecure is defined and nginx_insecure == "yes"
+  notify: restart nginx
+
+- name: Create global htpasswd file
+  become: True
+  htpasswd:
+    path: /usr/local/nginx/global_htpasswd
+    name: "{{ nginx_global_auth_username }}"
+    password: "{{ nginx_global_auth_password }}"
+
+- name: Check if nginx service file exists
+  become: True
+  stat:
+    path: /lib/systemd/system/nginx.service
+  register: nginx_service_stat_result
+
+- name: Add nginx service file
+  become: True
+  template:
+    src: ../files/nginx.service
+    dest: /lib/systemd/system/nginx.service
+  when: nginx_check.stdout.find('dead') != -1 and nginx_service_stat_result.stat.exists == False
+
+- name: Enable and start nginx service
+  become: True
+  systemd:
+    name: nginx.service
+    state: started
+    masked: no
+    enabled: yes

@@ -1,0 +1,4 @@
+---
+nginx_version: latest
+nginx_installation_url: "https://ngxpagespeed.com/install"
+nginx_custom_modules: "--with-http_ssl_module --with-http_v2_module"

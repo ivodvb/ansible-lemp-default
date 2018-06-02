@@ -1,0 +1,8 @@
+---
+mysql_port: 3306
+mysql_bind_address: 127.0.0.1
+
+mysql_packages:
+  - python-mysqldb
+  - mysql-server
+  - mysql-client

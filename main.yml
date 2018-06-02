@@ -1,0 +1,10 @@
+---
+- name: Main installation
+  hosts: all
+  gather_facts: no
+  roles:
+    - common
+    - letsencrypt
+    - php
+    - nginx
+    - mysql

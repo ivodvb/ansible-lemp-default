@@ -1,0 +1,38 @@
+---
+- name: Add certbot ppa for Letsencrypt
+  become: true
+  apt_repository:
+    repo: ppa:certbot/certbot
+
+- name: Install certbot
+  become: true
+  apt:
+    update_cache: true
+    name: certbot
+    cache_valid_time: "{{ apt_cache_timeout }}"
+
+- name: Check if nginx is running
+  command: systemctl status nginx
+  ignore_errors: yes
+  failed_when: false
+  register: nginx_check
+
+- name: Create SSL certificate when nginx is not running (standalone)
+  become: true
+  command: "certbot certonly --standalone -d {{ hostname }} --agree-tos -m {{ letsencrypt_email }} -n" # todo add support for multiple hostnames
+  when: nginx_check.stdout.find('dead') > 0 and letsencrypt_ssl is defined and letsencrypt_ssl == "yes"
+
+- name: Create SSL certificate when nginx is running (certonly webroot)
+  become: true
+  command: "certbot certonly --webroot -w {{ webroot }} -d {{ hostname }} --agree-tos -m {{ letsencrypt_email }} -n" # todo add support for multiple hostnames
+  when: nginx_check.stdout.find('dead') == -1 and letsencrypt_ssl is defined and letsencrypt_ssl == "yes"
+  notify:
+  - restart nginx
+
+- cron:
+    name: "Letsencrypt renew"
+    minute: "37"
+    hour: "5,17"
+    job: "certbot certonly --webroot -w {{ webroot }} -d {{ hostname }} && systemctl restart nginx" # todo add support for multiple hostnames
+  become: true
+  when: letsencrypt_ssl is defined and letsencrypt_ssl == "yes"

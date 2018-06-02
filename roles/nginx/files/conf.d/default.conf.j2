@@ -1,0 +1,36 @@
+server {
+    listen 80;
+    server_name {{ hostname }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen [::]:443 ssl http2 ipv6only=on;
+    listen 443 ssl http2;
+
+    ssl_certificate /etc/letsencrypt/live/{{ hostname }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ hostname }}/privkey.pem;
+
+    server_name {{ hostname }};
+
+    root /var/www/html/public;
+    index index.php;
+
+    location /goaccess-report.html {
+        try_files $uri $uri/ =404;
+        auth_basic "Restricted Content";
+        auth_basic_user_file /usr/local/nginx/global_htpasswd;
+    }
+
+    location / {
+       try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        try_files $uri /index.php =404;
+        fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
