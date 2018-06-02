@@ -38,7 +38,6 @@ Run: `ansible-vault encrypt roles/mysql/vault/credentials.yml --ask-vault-pass` 
 - Add support for Apache
 - Create non-root user
 - Make nginx setup idempotent
-- Add HSTS support
 - Setup ufw
 - Make goaccess setup idempotent
 - Separate role concerns better
