@@ -2,7 +2,7 @@
 
 This set of roles will install:
 - PHP 7.2
-- nginx (latest) with SSL and HTTP2 support
+- nginx (latest) with SSL (including HSTS and Forward Secrecy) and HTTP2 support
 - MySQL (latest in the Ubuntu 16.04 APT repositories)
 - Letsencrypt (latest)
 
