@@ -41,6 +41,5 @@ Run: `ansible-vault encrypt roles/mysql/vault/credentials.yml --ask-vault-pass` 
 - Add HSTS support
 - Setup ufw
 - Make goaccess setup idempotent
-- Secure report.html with htaccess
 - Separate role concerns better
 - Find a proper way to secure the goaccess websocket
