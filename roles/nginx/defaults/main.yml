@@ -3,3 +3,4 @@ nginx_version: latest
 nginx_installation_url: "https://ngxpagespeed.com/install"
 nginx_custom_modules: "--with-http_ssl_module --with-http_v2_module"
 nginx_ssl_protocol_support: "TLSv1.2 TLSv1.1 TLSv1"
+nginx_default_file_action: "try_files $uri $uri/ =404;"

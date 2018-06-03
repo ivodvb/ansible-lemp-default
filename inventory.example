@@ -9,3 +9,4 @@ letsencrypt_ssl=yes
 nginx_global_auth_username=username
 nginx_global_auth_password=password
 nginx_ssl_protocol_support="TLSv1.2"
+nginx_default_file_action="try_files $uri $uri/ /index.php$is_args$args;"

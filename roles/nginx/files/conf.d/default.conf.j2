@@ -30,7 +30,7 @@ server {
     }
 
     location / {
-       try_files $uri $uri/ /index.php$is_args$args;
+       {{ nginx_default_file_action }}
     }
 
     location ~ \.php$ {
