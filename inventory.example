@@ -8,3 +8,4 @@ letsencrypt_email=info@certbot.org
 letsencrypt_ssl=yes
 nginx_global_auth_username=username
 nginx_global_auth_password=password
+nginx_ssl_protocol_support="TLSv1.2"
